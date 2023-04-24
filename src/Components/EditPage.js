@@ -1,25 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import React, {  useState } from 'react';
+import {toast} from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 
 const EditPage = () => {
     const [fields, setFields] = useState([{ chapterName: '', startPage: '', endPage: '' }])
     const [editingIndex, setEditingIndex] = useState(null)
+    
+    const photoSelected = useSelector(state => state.selectedImages)
+    
+    console.log(startIndex ,endIndex)
     const handleAddField = () => {
         const newFields = [...fields, { chapterName: '', startPage: '', endPage: '' }];
+        if (photoSelected.length > 0 ) {
+            var startIndex = photoSelected[0].id
+            var endIndex = photoSelected[photoSelected.length-1] .id 
+        }
         setFields(newFields);
+        toast.success('chapter added sucessfully')
     }
-    // console.log(fields)
-    const photoSelected= useSelector(state => state.selectedImages)
-    console.log(photoSelected)
     
     
-
     const handleFieldChange = (index, event) => {
         event.preventDefault()
         const newFields = [...fields]
         newFields[index][event.target.name] = event.target.value;
-
+        
         const startPage = Number(newFields[index].startPage);
         const endPage = Number(newFields[index].endPage);
         if (startPage <= 0 || endPage <= 0 || startPage > endPage) {
@@ -28,9 +33,10 @@ const EditPage = () => {
         else {
             setFields(newFields)
         }
-
+        
     }
-
+    
+    
     const handleEdit = (index) => {
         setEditingIndex(index);
     }
@@ -38,11 +44,9 @@ const EditPage = () => {
     const handleSave = () => {
         setEditingIndex(null);
     }
-
+    
     const handleDelete = (index) => {
-        const newFields = [...fields];
-        newFields.splice(index, 1);
-        setFields(newFields);
+        setFields(fields);
     }
 
 
@@ -66,8 +70,7 @@ const EditPage = () => {
                             style={{ width: '50px' }}
                             type="number"
                             name='startPage'
-                            // value={num}
-                            // value={photoSelected[0].id}
+                            value={startIndex}
                             onChange={e => handleFieldChange(index, e)}
                         />
                     </label>
@@ -77,17 +80,20 @@ const EditPage = () => {
                             style={{ width: '50px' }}
                             type="number"
                             name='endPage'
-                            value={field.endPage}
+                            value={endIndex}
                             onChange={e => handleFieldChange(index, e)}
                         />
                     </label>
 
-                    {editingIndex === index ? (
+                    {editingIndex === index ? (<>
+
                         <button className='btn btn-primary m-2' onClick={handleSave}>Save</button>
+                        <button className='btn btn-primary m-2' onClick={() => handleDelete(index)}>Delete</button>
+                    </>
                     ) : (
                         <>
                             <button className='btn btn-primary m-2' onClick={() => handleEdit(index)}>Edit</button>
-                            <button className='btn btn-primary m-2' onClick={() => handleDelete(index)}>Delete</button>
+
                         </>
                     )}
 
