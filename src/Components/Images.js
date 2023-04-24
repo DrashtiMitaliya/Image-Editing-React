@@ -7,6 +7,8 @@ import ImageData from '../Constant/db';
 const Images = () => {
     const selectedImages1 = useSelector(state => state.selectedImages)
     const [selectedImages, setSelectedImages] = useState([]);
+    const dispatch = useDispatch();
+    
     const handleImageSelect = (event, item) => {
         if (event.target.checked) {
             setSelectedImages([...selectedImages, item]);
@@ -14,18 +16,17 @@ const Images = () => {
             setSelectedImages(selectedImages.filter(selectedImage => selectedImage.id !== item.id));
         }
     }
-
-
-    const dispatch = useDispatch();
-
+    
     useEffect(() => {
         dispatch({
-            type: 'SET_SELECTED_IMAGES',
-            payload: selectedImages
+          type: 'SET_SELECTED_IMAGES',
+          payload: selectedImages,
         });
-    }, [selectedImages, dispatch,selectedImages1])
-//   console.log('selected image ',selectedImages1)
+      }, [selectedImages, dispatch, selectedImages1]);
 
+
+    
+   
     return (
         <>
             {ImageData.map((item) => {

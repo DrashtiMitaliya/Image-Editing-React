@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ImageData from '../Constant/db';
-import { useSelector } from 'react-redux';
+import { useSelector } from 'redux';
 
 
 
@@ -18,11 +18,6 @@ const Edit = () => {
         }
     }, [selectedImages1])
 
-    // for (let i = 0; i < selectedImages1.length; i++) {
-    //     const currentObject = selectedImages1[i];
-    //     console.log(currentObject)
-
-    // }
     const setEnableChapter1 = () => {
         setIsEnabled(true)
         setEnabledInput(false)

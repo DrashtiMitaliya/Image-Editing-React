@@ -6,10 +6,3 @@ export const setSelectedImages = (selectedImages) => {
     payload: selectedImages,
   };
 };
-
-// export const chapter = () =>{
-//   return {
-//     type :CHAPTER ,
-//     payload :
-//   }
-// } 

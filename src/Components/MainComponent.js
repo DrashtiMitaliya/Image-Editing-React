@@ -1,6 +1,6 @@
 import React from 'react'
 import Images from './Images'
-import Edit from './Edit'
+import EditPage from './EditPage'
 
 const MainComponent = () => {
     return (
@@ -12,7 +12,8 @@ const MainComponent = () => {
                     </div>
                 </div>
                 <div className="col-6">
-                    <Edit/>
+                    {/* <Edit/> */}
+                    <EditPage/>
                 </div>
             </div>
         </div>
