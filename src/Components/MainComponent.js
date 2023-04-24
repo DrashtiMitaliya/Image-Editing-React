@@ -8,12 +8,12 @@ const MainComponent = () => {
             <div className="row ">
                 <div className="col-6  ">
                     <div className="row border ">
-                        <Images/>
+                        <Images />
                     </div>
                 </div>
                 <div className="col-6">
                     {/* <Edit/> */}
-                    <EditPage/>
+                    <EditPage />
                 </div>
             </div>
         </div>

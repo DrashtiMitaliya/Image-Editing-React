@@ -1,22 +1,13 @@
-import { createStore } from 'redux';
 
-const initialState = {
-    selectedImages: [] ,
-    chapter : [] ,
-};
+import { configureStore } from '@reduxjs/toolkit';
+import photoSlice from './photoSlice';
 
-const reducer = (state = initialState, action) => {
-    switch (action.type) {
-        case 'SET_SELECTED_IMAGES':
-        
-            return {
-                ...state,
-                selectedImages: action.payload
-            };
+const store = configureStore({
+  reducer: {
+    photos: photoSlice,
+  },
+});
 
-        default:
-            return { ...state };
-    }
-};
+export default store;
 
-export const store = createStore(reducer);
+
