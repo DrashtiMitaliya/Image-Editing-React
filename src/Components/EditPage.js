@@ -6,15 +6,15 @@ const EditPage = () => {
     const [fields, setFields] = useState([{ chapterName: '', startPage: '', endPage: '' }])
     const [editingIndex, setEditingIndex] = useState(null)
     
-    
     const photoSelected = useSelector(state => state.selectedImages)
+    if (photoSelected.length > 0 ) {
+        var startIndex = photoSelected[0].id
+        var endIndex = photoSelected[photoSelected.length-1] .id 
+        console.log(startIndex ,endIndex)
+    }
     const handleAddField = () => {
         const newFields = [...fields, { chapterName: '', startPage: '', endPage: '' }];
-        if (photoSelected.length > 0 ) {
-            var startIndex = photoSelected[0].id
-            var endIndex = photoSelected[photoSelected.length-1] .id 
-            console.log(startIndex ,endIndex)
-        }
+        
         setFields(newFields);
         toast.success('chapter added sucessfully')
     }
