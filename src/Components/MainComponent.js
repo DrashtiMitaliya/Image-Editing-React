@@ -6,7 +6,7 @@ const MainComponent = () => {
     return (
         <div className='container-fluid'>
             <div className="row ">
-                <div className="col-6  ">
+                <div className="col-6 images " >
                     <div className="row border ">
                         <Images />
                     </div>
