@@ -2,19 +2,27 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedImagesInState } from "../Redux/photoSlice";
-import { getItemsBetweenIds } from "../utils/utility";
+import { CheckFieldValidation, getItemsBetweenIds } from "../utils/utility";
+import {
+  ALL_FIELDS_ARE_EMPTY,
+  ALREADY_CHAPTER_EXISTS,
+  COVERED_ALL_PAGES,
+  FILL_BEFORE_SAVE,
+  INVALID_PAGE_NUMBERS,
+  OVERLAP_PAGE_RANGE,
+} from "../Constant/Messages";
 import ChapterBox from "./ChapterBox";
 
 const EditPage = () => {
   let initialState = [
-    { chapterName: "KGF chapter 1 ", startPage: "1", endPage: "6", id: 0 },
- 
+
   ];
   const [fields, setFields] = useState(initialState);
-  const [editingIndex, setEditingIndex] = useState();
-  const [startIndex, setStartIndex] = useState(null); 
+  const [editingIndex, setEditingIndex] = useState(0);
+  const [currentObj, setCurrentObj] = useState([{}]);
+  const [startIndex, setStartIndex] = useState();
   const [endIndex, setEndIndex] = useState(null);
-  const [isDisabled, setIsDisabled] = useState(true);
+  const [isDisabled, setIsDisabled] = useState(false);
   const [chapterName, setChapterName] = useState("");
   const [startPage, setStartPage] = useState();
   const [endPage, setEndPage] = useState();
@@ -39,22 +47,43 @@ const EditPage = () => {
     }
   }, [newPhotoselectedArr, photoSelected.length, photoSelected]);
 
-  const handleAddField = (endIndex) => {
-    const tempObj = {
-      chapterName: "",
-      startPage: "",
-      endPage: "",
-      id: fields.length,
-    };
-    if (endIndex < 30) {
+  const handleAddField = (e, id) => {
+    if (fields.length > 0) {
+      if (!CheckFieldValidation(fields)) {
+        toast.error("Fill all Input First");
+      } else {
+        if (fields.length >= 1) {
+          setEditingIndex((prev) => prev + 1);
+        }
+        const tempObj = {
+          chapterName: "",
+          startPage: "",
+          endPage: "",
+          id: fields.length,
+        };
+        setFields((prev) => [...prev, tempObj]);
+      }
+    } else {
+      const tempObj = {
+        chapterName: "",
+        startPage: "",
+        endPage: "",
+        id: fields.length,
+      };
       setFields((prev) => [...prev, tempObj]);
       toast.success("chapter added successfully");
-      dispatch(setSelectedImagesInState([]));
-    } else {
     }
   };
 
   const handleChapterNameChange = (e, id) => {
+    const updatedFields = fields.map((field, index) => {
+      if (index === id) {
+        return { ...field, chapterName: e.target.value };
+      } else {
+        return field;
+      }
+    });
+    setFields(updatedFields);
     setEditingIndex(id);
     setChapterName(e.target.value);
   };
@@ -70,7 +99,7 @@ const EditPage = () => {
     if (selectedIndex >= 0 && selectedIndex <= 30) {
       setStartPage(selectedIndex);
       dispatch(
-        setSelectedImagesInState(getItemsBetweenIds(selectedIndex, endIndex))
+        setSelectedImagesInState(getItemsBetweenIds(startIndex, endIndex))
       );
     }
   };
@@ -80,32 +109,92 @@ const EditPage = () => {
     const end = e.target.value;
     if (end >= 0 && end <= 30) {
       setEndPage(end);
-      dispatch(setSelectedImagesInState(getItemsBetweenIds(startIndex, end)));
+      dispatch(setSelectedImagesInState(getItemsBetweenIds(startPage, end)));
     }
   };
 
   const handleEdit = (e, startPage, endPage, id) => {
     setEditingIndex(id);
-    setIsDisabled(true);
     dispatch(setSelectedImagesInState(getItemsBetweenIds(startPage, endPage)));
   };
+  // const handleSave = (e, id, chapterName, startPage, endPage) => {
+  //   e.preventDefault();
+  //   if (chapterName === null || startPage === null || endPage === null) {
+  //     toast.error("Please fill in all the fields");
+  //     return;
+  //   }
+  //   const updatedFields = fields.map((field) => {
+  //     if (field.id === id) {
+  //       return {
+  //         ...field,
+  //         chapterName,
+  //         startPage,
+  //         endPage,
+  //       };
+  //     }
+  //     return field;
+  //   });
+  //   setFields(updatedFields);
+  //   setIsDisabled(false);
+  //   setEditingIndex(null);
+  //   dispatch(setSelectedImagesInState(getItemsBetweenIds(startPage, endPage)));
+  //   toast.success("Chapter saved successfully");
+  // };
 
-  const handleSave = (e, chapterName, startPage, endPage, id) => {
-    if (endPage === 0 || startPage === 0) {
-      toast.error(" please fill the data ");
-    } else {
-      setEditingIndex(id);
-      setIsDisabled(true);
+  const handleSaveClick = (index) => {
+    const newfields = [...fields];
+    const currentChapter = newfields[index];
+
+    if (
+      !currentChapter.chapterName ||
+      !currentChapter.startPage ||
+      !currentChapter.endPage
+    ) {
+      toast.error(FILL_BEFORE_SAVE);
+      return;
     }
-  };
 
+    const existingChapter = newfields.find(
+      (chapter, i) =>
+        i !== index && chapter.chapterName === currentChapter.chapterName
+    );
+    if (existingChapter) {
+      toast.error(ALREADY_CHAPTER_EXISTS);
+      return;
+    }
+
+    if (
+      currentChapter.startPage <= 0 ||
+      currentChapter.endPage <= 0 ||
+      currentChapter.startPage > 30 ||
+      currentChapter.endPage > 30 ||
+      currentChapter.startPage > currentChapter.endPage
+    ) {
+      toast.error(INVALID_PAGE_NUMBERS);
+      return;
+    }
+
+    const overlappingChapter = newfields.find(
+      (liveChapter, i) =>
+        i !== index &&
+        liveChapter.startPage <= currentChapter.endPage &&
+        liveChapter.endPage >= currentChapter.startPage
+    );
+
+    if (overlappingChapter) {
+      toast.error(OVERLAP_PAGE_RANGE);
+      console.log("overlapping",overlappingChapter);
+      return;
+    }
+    currentChapter.isEnable = false;
+    setCurrentObj(newfields);
+    dispatch(setSelectedImagesInState(getItemsBetweenIds(null,null)))
+  };
   const handleDelete = (e, id) => {
-    console.log(id);
     const newArray = fields.filter((ele) => ele.id !== id);
-    const updateFields = fields.filter((field) => field.id !== id);
     setFields([...newArray]);
-    console.log(newArray);
-    console.log(fields);
+    dispatch(setSelectedImagesInState(getItemsBetweenIds(startPage, endPage)));
+    toast.success("chapter deleted successfully");
   };
 
   return (
@@ -118,7 +207,7 @@ const EditPage = () => {
             handleChapterNameChange={handleChapterNameChange}
             handleStartPageChange={handleStartPageChange}
             handleEndPageChange={handleEndPageChange}
-            handleSave={handleSave}
+            handleSave={handleSaveClick}
             editingIndex={editingIndex}
             index={index}
             field={{ ...field }}
@@ -136,9 +225,9 @@ const EditPage = () => {
                 .length
             }
             className="btn btn-danger"
-            onClick={() => handleAddField(endIndex)}
+            onClick={(e) => handleAddField(e)}
           >
-            Add Chapter
+            Add Chapter 
           </button>
         </div>
       </div>

@@ -17,8 +17,8 @@ const ChapterBox = ({
   handleChapterNameChange,
 }) => {
   return (
-    <div key={index} className="m-2 p-2">
-      {console.log(field)}
+    <div key={index} className="m-2 p-2"> 
+     {index+1}
       <label htmlFor="" className="p-2">
         Chapter Name :
         <input
@@ -27,7 +27,7 @@ const ChapterBox = ({
           type="text"
           name="chapterName"
           value={field.chapterName}
-          onChange={handleChapterNameChange}
+          onChange={(e) => handleChapterNameChange(e, field.id)}
         />
       </label>
       <label htmlFor="" className="p-2">
@@ -38,8 +38,7 @@ const ChapterBox = ({
           disabled={field.id !== editingIndex}
           type="number"
           name="startPage"
-          min={1}
-          max={30}
+          // value={field.startPage}
           value={field.id === editingIndex ? startIndex : field.startPage}
           onChange={(e) => handleStartPageChange(e, field.id)}
         />
@@ -52,8 +51,7 @@ const ChapterBox = ({
           style={{ width: "60px" }}
           type="number"
           name="endPage"
-          min={1}
-          max={30}
+          // value={field.endPage}
           value={field.id === editingIndex ? endIndex : field.endPage}
           onChange={(e) => handleEndPageChange(e, field.id)}
         />
@@ -62,7 +60,15 @@ const ChapterBox = ({
         <>
           <button
             className="btn btn-primary m-1"
-            onClick={(e) => handleSave(e, field.id)}
+            onClick={(e) =>
+              handleSave(
+                e,
+                field.id,
+                field.chapterName,
+                field.startPage,
+                field.endPage
+              )
+            }
           >
             <BsCheckLg />
           </button>
